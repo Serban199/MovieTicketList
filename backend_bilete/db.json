@@ -1,0 +1,16 @@
+[
+    {
+        "movie_title": "ggggg",
+        "customer_name": "andrei vasile",
+        "row": 5,
+        "seat": 12,
+        "price": 35,
+        "id": 5
+    },
+    {
+        "movie_title": "a",
+        "customer_name": "a",
+        "price": "33",
+        "id": 6
+    }
+]
