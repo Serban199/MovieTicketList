@@ -13,7 +13,6 @@ function App() {
   const [pret, setPret] = useState('');
   const [idBiletModificat, setIdBiletModificat] = useState(null);//variabila pt id ul biletelor mod
 
-  // am mutat cererea get intr-o functie separata ca sa o putem refolosi
   const incarcaBilete = () => {
     fetch('http://localhost:8081/tickets')
       .then(raspuns => raspuns.json())
@@ -22,29 +21,26 @@ function App() {
   };
 
   const stergeBilet = (id) => {
-    // am schimbat ghilimelele aici in backticks
     fetch(`http://localhost:8081/tickets/${id}`, {
       method: 'DELETE'
     })
       .then(raspuns => {
         if(raspuns.ok) {
-          incarcaBilete(); // reincarca lista de bilete dupa stergere
+          incarcaBilete(); 
         } else {
           console.log('eroare la stergerea biletului:', raspuns.statusText);
         }})
       
   };
 
-  // se apeleaza automat o singura data cand deschizi pagina
   useEffect(() => {
     incarcaBilete();
   }, []);
 
-  // functia care trimite datele noi la python cand apesi butonul
   const adaugaBilet = (eveniment) => {
     eveniment.preventDefault(); // opreste browserul din a da refresh la pagina
 
-    // construim pachetul cu date exact cum il asteapta python
+    // construim pachetul cu date 
     const biletNou = {
       movie_title: titluFilm,
       customer_name: numeClient,
@@ -65,14 +61,12 @@ function App() {
         setTitluFilm('');
         setNumeClient('');
         setPret('');
-        // cerem iar lista de bilete de la server ca sa apara biletul nou
         incarcaBilete();
       }
     })
     .catch(eroare => console.log('eroare la adaugare:', eroare));
-  }; // aici am pus acolada care inchide corect functia de adaugare
+  }; 
 
-  // acum functia de modificare este libera si complet separata
   const modificaBilet = (eveniment) => {
     eveniment.preventDefault();
 
@@ -91,7 +85,7 @@ function App() {
     })
     .then(raspuns => {
       if (raspuns.ok) {
-        incarcaBilete(); // reincarca lista de bilete dupa stergere
+        incarcaBilete(); 
         
         setTitluFilm('');
         setNumeClient('');
@@ -110,8 +104,7 @@ function App() {
     setPret(bilet.price);
     setIdBiletModificat(bilet.id);
   };
-
-  // aici este partea vizuala care iti lipsea si care leaga totul
+   //apelarea functiilor react
   return (
     <div className="App" style={{ padding: '20px' }}>
       <h1>sistem de gestiune bilete</h1>
