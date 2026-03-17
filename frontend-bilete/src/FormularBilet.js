@@ -1,10 +1,10 @@
-function FormularBilet({ titlu, setTitlu, pret, setPret, client, setClient, onSave, esteEditare }) {
+function FormularBilet({ titlu, setTitlu, pret, setPret, client, setClient, onSave, esteEditare, onCancel }) {
     return (
         <form onSubmit={onSave} style={{ marginBottom: '30px' }}>
             <input 
                 type="text" 
                 placeholder="nume film" 
-                value={titlu} // folosim numele din antet
+                value={titlu} 
                 onChange={(e) => setTitlu(e.target.value)}
                 required 
                 style={{ marginRight: '10px' }}
@@ -12,7 +12,7 @@ function FormularBilet({ titlu, setTitlu, pret, setPret, client, setClient, onSa
             <input 
                 type="text" 
                 placeholder="nume client" 
-                value={client} // folosim numele din antet
+                value={client} 
                 onChange={(e) => setClient(e.target.value)}
                 required 
                 style={{ marginRight: '10px' }}
@@ -20,7 +20,7 @@ function FormularBilet({ titlu, setTitlu, pret, setPret, client, setClient, onSa
             <input 
                 type="number" 
                 placeholder="pret" 
-                value={pret} // folosim numele din antet
+                value={pret} 
                 onChange={(e) => setPret(e.target.value)}
                 required 
                 style={{ marginRight: '10px' }}
@@ -28,6 +28,13 @@ function FormularBilet({ titlu, setTitlu, pret, setPret, client, setClient, onSa
             <button type="submit">
                 {esteEditare ? 'salveaza modificarea' : 'adauga bilet'}
             </button>
+            
+            {}
+            {esteEditare && (
+                <button type="button" onClick={onCancel} style={{ marginLeft: '10px' }}>
+                    anuleaza
+                </button>
+            )}
         </form>
     );
 }

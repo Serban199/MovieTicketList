@@ -40,14 +40,12 @@ function App() {
   const adaugaBilet = (eveniment) => {
     eveniment.preventDefault(); // opreste browserul din a da refresh la pagina
 
-    // construim pachetul cu date 
     const biletNou = {
       movie_title: titluFilm,
       customer_name: numeClient,
       price: pret
     };
 
-    // trimitem pachetul cu post
     fetch('http://localhost:8081/tickets', {
       method: 'POST',
       headers: {
@@ -57,7 +55,6 @@ function App() {
     })
     .then(raspuns => {
       if (raspuns.ok) {
-        // curatam casutele formularului dupa succes
         setTitluFilm('');
         setNumeClient('');
         setPret('');
@@ -104,6 +101,14 @@ function App() {
     setPret(bilet.price);
     setIdBiletModificat(bilet.id);
   };
+
+  const anuleazaEditare = () => {
+    setTitluFilm('');
+    setNumeClient('');
+    setPret('');
+    setIdBiletModificat(null);
+  };
+
    //apelarea functiilor react
   return (
     <div className="App" style={{ padding: '20px' }}>
@@ -117,6 +122,7 @@ function App() {
         pret={pret} 
         setPret={setPret}
         onSave={idBiletModificat ? modificaBilet : adaugaBilet}
+        onCancel={anuleazaEditare}
         esteEditare={!!idBiletModificat}
       />
 
