@@ -5,7 +5,6 @@ import os
 import requests
 import uvicorn
 
-# variabile globale pentru api-uri externe
 url_baza_omdb = "http://www.omdbapi.com/?apikey=f7f7b53&t="
 url_baza_news = "https://newsapi.org/v2/everything?apiKey=a280d9a720cf41f899cd40221544623d&q="
 
@@ -40,31 +39,48 @@ def get_bilete():
     bilete = citeste_bilete()
     
     for b in bilete:
-        # folosim movie_title pentru ca asa este salvat in db.json
         nume_film = b.get("movie_title")        
         if nume_film:
             nume_curat = nume_film.strip()
-            scor_url = url_baza_omdb + nume_curat
-            raspuns_omdb = requests.get(scor_url)
-            date_omdb = raspuns_omdb.json()
-
-            if date_omdb.get("Response") == "True":
-                b["scor_film"] = date_omdb.get("imdbRating")
-            else:
+            
+            try:
+                scor_url = url_baza_omdb + nume_curat
+                raspuns_omdb = requests.get(scor_url, timeout=5)
+                date_omdb = raspuns_omdb.json()
+                if date_omdb.get("Response") == "True":
+                    b["scor_film"] = date_omdb.get("imdbRating")
+                else:
+                    b["scor_film"] = "n/a"
+            except:
                 b["scor_film"] = "n/a"
 
-            stiri_url = url_baza_news + nume_film
-            raspuns_news = requests.get(stiri_url)
-            date_news = raspuns_news.json()
-            
-            b["stiri_film"] = date_news.get("articles", [])[:2]
-            
+            try:
+                stiri_url = url_baza_news + nume_film
+                raspuns_news = requests.get(stiri_url, timeout=5)
+                date_news = raspuns_news.json()
+                b["stiri_film"] = date_news.get("articles", [])[:2]
+            except:
+                b["stiri_film"] = []
+
+            try:
+                url_harti = "https://nominatim.openstreetmap.org/search?format=json&q=cinema+city+iasi"
+                headere = {'user-agent': 'proiect_facultate_bilete'}
+                raspuns_harti = requests.get(url_harti, headers=headere, timeout=5)
+                date_harti = raspuns_harti.json()
+                if len(date_harti) > 0:
+                    b["adresa_cinema"] = date_harti[0].get("display_name")
+                else:
+                    b["adresa_cinema"] = "n/a"
+            except:
+                b["adresa_cinema"] = "n/a"
+                
     return bilete
 
-@app.post("/tickets", status_code=201)
+@app.post("/tickets", status_code=201)#modificam codul pt succes 201 craeted
 def adauga_bilet(bilet_nou: dict):
     bilete = citeste_bilete()
     
+    # gasim cel mai mare id si adaugam 1
     max_id = 0
     for bilet in bilete:
         if bilet.get("id", 0) > max_id:

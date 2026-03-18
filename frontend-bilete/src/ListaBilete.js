@@ -42,6 +42,17 @@ function ListaBilete({ bilete, onSterge, onEdit }) {
               sterge
             </button>
           </div>
+          <div style={{ marginBottom: '10px', fontSize: '18px' }}>
+            film: {bilet.movie_title} | client: {bilet.customer_name} | pret: {bilet.price} lei
+          </div>
+          
+          <div style={{ marginBottom: '10px', color: '#444' }}>
+            nota imdb: {bilet.scor_film ? bilet.scor_film : 'se incarca...'}
+          </div>
+
+          <div style={{ marginBottom: '10px', color: '#0066cc', fontSize: '14px' }}>
+            locatie cinema: {bilet.adresa_cinema ? bilet.adresa_cinema : 'se incarca...'}
+          </div>
         </li>
       ))}
     </ul>
