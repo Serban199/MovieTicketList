@@ -21,6 +21,7 @@ app.add_middleware(
 
 fisier_db = "db.json"
 
+
 def citeste_bilete():
     if not os.path.exists(fisier_db):
         return []
@@ -30,19 +31,21 @@ def citeste_bilete():
         except json.JSONDecodeError:
             return []
 
+
 def salveaza_bilete(bilete):
     with open(fisier_db, "w") as f:
         json.dump(bilete, f, indent=4)
 
+
 @app.get("/tickets")
 def get_bilete():
     bilete = citeste_bilete()
-    
+
     for b in bilete:
-        nume_film = b.get("movie_title")        
+        nume_film = b.get("movie_title")
         if nume_film:
             nume_curat = nume_film.strip()
-            
+
             try:
                 scor_url = url_baza_omdb + nume_curat
                 raspuns_omdb = requests.get(scor_url, timeout=5)
@@ -65,7 +68,8 @@ def get_bilete():
             try:
                 url_harti = "https://nominatim.openstreetmap.org/search?format=json&q=cinema+city+iasi"
                 headere = {'user-agent': 'proiect_facultate_bilete'}
-                raspuns_harti = requests.get(url_harti, headers=headere, timeout=5)
+                raspuns_harti = requests.get(
+                    url_harti, headers=headere, timeout=5)
                 date_harti = raspuns_harti.json()
                 if len(date_harti) > 0:
                     b["adresa_cinema"] = date_harti[0].get("display_name")
@@ -73,50 +77,54 @@ def get_bilete():
                     b["adresa_cinema"] = "n/a"
             except:
                 b["adresa_cinema"] = "n/a"
-                
+
     return bilete
 
-@app.post("/tickets", status_code=201)#modificam codul pt succes 201 craeted
+
+@app.post("/tickets", status_code=201)  # modificam codul pt succes 201 craeted
 def adauga_bilet(bilet_nou: dict):
     bilete = citeste_bilete()
-    
+
     # gasim cel mai mare id si adaugam 1
     max_id = 0
     for bilet in bilete:
         if bilet.get("id", 0) > max_id:
             max_id = bilet.get("id")
-    
+
     bilet_nou["id"] = max_id + 1
-    
+
     bilete.append(bilet_nou)
     salveaza_bilete(bilete)
     return bilet_nou
 
+
 @app.put("/tickets/{id_bilet}")
 def modifica_bilet(id_bilet: int, bilet_actualizat: dict):
     bilete = citeste_bilete()
-    
+
     for index, bilet in enumerate(bilete):
         if bilet.get("id") == id_bilet:
             bilet_actualizat["id"] = id_bilet
             bilete[index] = bilet_actualizat
             salveaza_bilete(bilete)
             return bilet_actualizat
-            
+
     raise HTTPException(status_code=404, detail="biletul nu a fost gasit")
+
 
 @app.delete("/tickets/{id_bilet}")
 def sterge_bilet(id_bilet: int):
     bilete = citeste_bilete()
     bilete_initiale = len(bilete)
-    
+
     bilete_ramase = [b for b in bilete if b.get("id") != id_bilet]
-    
+
     if len(bilete_ramase) == bilete_initiale:
         raise HTTPException(status_code=404, detail="biletul nu a fost gasit")
-        
+
     salveaza_bilete(bilete_ramase)
     return {"mesaj": "bilet sters cu succes"}
+
 
 # pornire automata daca rulezi fisierul direct din vscode
 if __name__ == "__main__":
